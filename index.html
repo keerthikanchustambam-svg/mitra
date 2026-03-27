@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KRUSHIMITRA - AgriTech Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f9f4;
+        }
+
+        header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #388e3c;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        nav button {
+            background-color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        nav button:hover {
+            background-color: #c8e6c9;
+        }
+
+        section {
+            display: none;
+            padding: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #ccc;
+            margin-bottom: 20px;
+        }
+
+        input, select, textarea, button {
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .listing {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background-color: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌾 KRUSHIMITRA</h1>
+    <p>Farmer Digital Assistant & Marketplace</p>
+</header>
+
+<nav>
+    <button onclick="showSection('advisory')">Crop Advisory</button>
+    <button onclick="showSection('weather')">Weather</button>
+    <button onclick="showSection('market')">Market Prices</button>
+    <button onclick="showSection('income')">Income Planner</button>
+    <button onclick="showSection('schemes')">Govt Schemes</button>
+    <button onclick="showSection('sellCrop')">Sell Crops</button>
+    <button onclick="showSection('buySeeds')">Seed Marketplace</button>
+</nav>
+
+<!-- Crop Advisory -->
+<section id="advisory" class="active">
+    <div class="card">
+        <h2>Crop Advisory</h2>
+
+        <label>Select Crop:</label>
+        <select id="crop">
+            <option value="wheat">Wheat</option>
+            <option value="rice">Rice</option>
+            <option value="cotton">Cotton</option>
+        </select>
+
+        <label>Soil Type:</label>
+        <select id="soil">
+            <option value="loamy">Loamy</option>
+            <option value="clay">Clay</option>
+            <option value="sandy">Sandy</option>
+        </select>
+
+        <button onclick="getAdvisory()">Get Recommendation</button>
+        <p id="advisoryResult"></p>
+    </div>
+</section>
+
+<!-- Weather -->
+<section id="weather">
+    <div class="card">
+        <h2>Weather Information</h2>
+
+        <input type="text" id="district" placeholder="Enter District Name">
+        <button onclick="getWeather()">Get Weather</button>
+        <p id="weatherResult"></p>
+    </div>
+</section>
+
+<!-- Market Prices -->
+<section id="market">
+    <div class="card">
+        <h2>Market Prices</h2>
+
+        <select id="marketCrop">
+            <option value="wheat">Wheat</option>
+            <option value="rice">Rice</option>
+            <option value="cotton">Cotton</option>
+        </select>
+
+        <button onclick="getPrice()">Check Price</button>
+        <p id="priceResult"></p>
+    </div>
+</section>
+
+<!-- Income Planner -->
+<section id="income">
+    <div class="card">
+        <h2>Income Planner</h2>
+
+        <input type="number" id="landSize" placeholder="Land Size (Acres)">
+        <select id="incomeCrop">
+            <option value="wheat">Wheat</option>
+            <option value="rice">Rice</option>
+        </select>
+
+        <button onclick="calculateIncome()">Estimate Income</button>
+        <p id="incomeResult"></p>
+    </div>
+</section>
+
+<!-- Government Schemes -->
+<section id="schemes">
+    <div class="card">
+        <h2>Government Schemes</h2>
+        <ul>
+            <li>PM-KISAN: ₹6000 yearly income support</li>
+            <li>Pradhan Mantri Fasal Bima Yojana</li>
+            <li>Soil Health Card Scheme</li>
+            <li>Kisan Credit Card (KCC)</li>
+        </ul>
+    </div>
+</section>
+
+<!-- Sell Crops -->
+<section id="sellCrop">
+    <div class="card">
+        <h2>Farmer-to-Farmer Crop Selling</h2>
+
+        <input type="text" id="farmerName" placeholder="Farmer Name">
+        <input type="text" id="cropName" placeholder="Crop Name">
+        <input type="number" id="quantity" placeholder="Quantity (Quintals)">
+        <input type="number" id="price" placeholder="Price per Quintal (₹)">
+
+        <button onclick="addCropListing()">Post Crop</button>
+
+        <h3>Available Listings</h3>
+        <div id="cropListings"></div>
+    </div>
+</section>
+
+<!-- Seed Marketplace -->
+<section id="buySeeds">
+    <div class="card">
+        <h2>Seed Marketplace</h2>
+
+        <input type="text" id="seedName" placeholder="Seed Name">
+        <input type="text" id="seedVariety" placeholder="Seed Variety">
+        <input type="number" id="seedPrice" placeholder="Price per Kg (₹)">
+
+        <button onclick="addSeedListing()">Add Seed</button>
+
+        <h3>Available Seeds</h3>
+        <div id="seedListings"></div>
+    </div>
+</section>
+
+<footer>
+    © 2026 AgriSathi | Empowering Small Farmers Digitally
+</footer>
+
+<script>
+function showSection(sectionId) {
+    let sections = document.querySelectorAll("section");
+    sections.forEach(section => section.classList.remove("active"));
+    document.getElementById(sectionId).classList.add("active");
+}
+
+function getAdvisory() {
+    let crop = document.getElementById("crop").value;
+    let soil = document.getElementById("soil").value;
+
+    let advice = "For " + crop + " in " + soil + " soil: ";
+
+    if (crop === "wheat")
+        advice += "Use NPK fertilizer and irrigate every 20 days.";
+    else if (crop === "rice")
+        advice += "Maintain water level and apply urea fertilizer.";
+    else
+        advice += "Use organic compost and moderate irrigation.";
+
+    document.getElementById("advisoryResult").innerText = advice;
+}
+
+function getWeather() {
+    let district = document.getElementById("district").value;
+    document.getElementById("weatherResult").innerText =
+        "Weather in " + district + ": 30°C, Partly Cloudy.";
+}
+
+function getPrice() {
+    let crop = document.getElementById("marketCrop").value;
+    let price = "";
+
+    if (crop === "wheat") price = "₹2200 per quintal";
+    if (crop === "rice") price = "₹2100 per quintal";
+    if (crop === "cotton") price = "₹7000 per quintal";
+
+    document.getElementById("priceResult").innerText =
+        "Current Price: " + price;
+}
+
+function calculateIncome() {
+    let land = document.getElementById("landSize").value;
+    let crop = document.getElementById("incomeCrop").value;
+
+    let incomePerAcre = (crop === "wheat") ? 30000 : 40000;
+    let total = land * incomePerAcre;
+
+    document.getElementById("incomeResult").innerText =
+        "Estimated Income: ₹" + total;
+}
+
+function addCropListing() {
+    let name = document.getElementById("farmerName").value;
+    let crop = document.getElementById("cropName").value;
+    let qty = document.getElementById("quantity").value;
+    let price = document.getElementById("price").value;
+
+    if(name === "" || crop === "" || qty === "" || price === "") {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    let div = document.createElement("div");
+    div.className = "listing";
+    div.innerHTML =
+        "<strong>" + crop + "</strong><br>" +
+        "Farmer: " + name + "<br>" +
+        "Quantity: " + qty + " Quintals<br>" +
+        "Price: ₹" + price + " per Quintal";
+
+    document.getElementById("cropListings").appendChild(div);
+}
+
+function addSeedListing() {
+    let seed = document.getElementById("seedName").value;
+    let variety = document.getElementById("seedVariety").value;
+    let price = document.getElementById("seedPrice").value;
+
+    if(seed === "" || variety === "" || price === "") {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    let div = document.createElement("div");
+    div.className = "listing";
+    div.innerHTML =
+        "<strong>" + seed + "</strong><br>" +
+        "Variety: " + variety + "<br>" +
+        "Price: ₹" + price + " per Kg";
+
+    document.getElementById("seedListings").appendChild(div);
+}
+</script>
+
+</body>
+</html>
